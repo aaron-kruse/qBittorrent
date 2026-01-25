@@ -4,6 +4,61 @@ qBittorrent - A BitTorrent client in Qt
 [![GitHub Actions CI Status](https://github.com/qbittorrent/qBittorrent/actions/workflows/ci_ubuntu.yaml/badge.svg)](https://github.com/qbittorrent/qBittorrent/actions)
 [![Coverity Status](https://scan.coverity.com/projects/5494/badge.svg)](https://scan.coverity.com/projects/5494)
 ********************************
+### Personal dev environment notes:
+Development was done on a Windows machine using a Docker container
+to isolate the dev dependencies to make cleanup easier. Code is
+managed on the Windows host then builds/testing happen from the
+container. This setup requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+for the container and [VcXsrv Windows X Server](https://sourceforge.net/projects/vcxsrv/)
+to test the Linux-based GUI app from the Windows host.
+
+TODO: simply these steps at some point by using `docker-compose.yaml`.
+
+#### Initial container setup (one-time)
+To set the container up for the first time, run:
+```
+# Create the initial container ("qbittorrent-builder")
+docker build -t qbittorrent-builder .
+```
+
+#### Building/testing changes (ongoing)
+Run the container, configure/compile the code, and run the executable.
+The first build will take a while (ex. maybe an hour) but subsequent
+builds will be much quicker. The X server must be started on the host
+(display 0) before running the executable. The steps below will leave
+you in the container when finished (where you can simply rebuild/rerun
+to test additional changes or exit out of the container if you're finished).
+```
+# Start/run the container (note: run with PowerShell)
+$HostIP = "192.168.1.143"
+docker run -it --rm --name qbittorrent_dev_env `
+  -e DISPLAY="${HostIP}:0" `
+  -v /tmp/.X11-unix:/tmp/.X11-unix `
+  -v ${PWD}:/app/source `
+  qbittorrent-builder bash
+
+# Use a build directory under the mounted volume so it's persisted on the host (outside the container)
+mkdir -p /app/source/build
+cd /app/source/build
+
+# Configure
+cmake /app/source -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=ON
+
+# Compile
+ninja
+
+# Run (compiled file is at /app/source/build/qbittorrent)
+./qbittorrent
+```
+
+#### Final cleanup
+Stop/remove the container when you no longer need it:
+```
+docker stop qbittorrent_dev_env
+docker rm qbittorrent_dev_env
+docker rmi qbittorrent-builder
+```
+
 ### Description:
 qBittorrent is a bittorrent client programmed in C++ / Qt that uses
 libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.
