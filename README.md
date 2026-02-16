@@ -30,6 +30,7 @@ you in the container when finished (where you can simply rebuild/rerun
 to test additional changes or exit out of the container if you're finished).
 ```
 # Start/run the container (note: run with PowerShell)
+cd "%UserProfile%\Source\Repos\qBittorrent"
 $HostIP = "192.168.1.143"
 docker run -it --rm --name qbittorrent_dev_env `
   -e DISPLAY="${HostIP}:0" `
