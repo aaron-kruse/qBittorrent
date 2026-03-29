@@ -1,0 +1,18 @@
+# Ignore the version control history (it's huge and unnecessary for the build)
+.git
+.gitignore
+
+# Ignore your local build artifacts so they don't conflict with the container
+build/
+dist/
+
+# Ignore Docker-specific configuration
+.docker/
+docker-compose.yaml
+
+# Ignore common OS/IDE junk
+.vscode/
+.idea/
+*.swp
+desktop.ini
+Thumbs.db

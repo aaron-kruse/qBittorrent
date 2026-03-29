@@ -1,0 +1,19 @@
+services:
+  builder:
+    build: 
+      context: .
+      dockerfile: .docker/Dockerfile
+    image: qbittorrent-builder
+    container_name: qbittorrent_dev_env
+    volumes:
+      - .:/app/source        # Maps your current Windows folder to the container
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=host.docker.internal:0  # Your Host IP
+      - QT_QPA_PLATFORM=xcb
+    ports:
+      - "8080:8080"
+    working_dir: /app/source/build
+    command: /bin/bash      # Keeps the container open for you
+    stdin_open: true        # Equivalent to -i
+    tty: true               # Equivalent to -t
